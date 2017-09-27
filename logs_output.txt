@@ -50,7 +50,8 @@ CREATE VIEW error_percent AS
 SELECT total_request.date,ROUND(100.0* error_request.count/total_request.count)
 FROM total_request, error_request
 WHERE total_request.date = error_request.date
-ORDER BY round DESC;
+ORDER BY round DESC
+LIMIT 1;
 
     date    | round 
 ------------+-------
