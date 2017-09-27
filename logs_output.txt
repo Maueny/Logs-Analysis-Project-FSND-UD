@@ -1,0 +1,63 @@
+1. What are the most popular three articles of all time?
+
+CREATE VIEW topthree AS
+SELECT title, count(title) AS views FROM log, articles 
+WHERE log.path LIKE  concat('/article/', articles.slug)
+GROUP BY title 
+ORDER BY views desc
+LIMIT 3;
+
+ title               | views  
+----------------------------------+--------
+ Candidate is jerk, alleges rival | 338647
+ Bears love berries, alleges bear | 253801
+ Bad things gone, say good people | 170098
+
+
+
+
+
+2. Who are the most popular article authors of all time? 
+
+CREATE VIEW mpaa AS
+SELECT authors.name, count(articles.author) AS views FROM log, articles, authors
+WHERE log.path LIKE concat('/article/', articles.slug) AND articles.author = authors.id
+GROUP BY authors.name
+ORDER BY views desc
+LIMIT 1;
+
+          name          | views  
+------------------------+--------
+ Ursula La Multa        | 507594
+
+
+3. On which days did more than 1% of requests lead to errors? 
+
+CREATE VIEW total_request AS
+SELECT count(*) AS count, date(time) AS date 
+FROM log 
+GROUP BY date 
+ORDER BY count DESC;
+
+CREATE VIEW error_request AS
+SELECT count(*) AS count, date(time) AS date 
+FROM log 
+WHERE status != '200 OK'
+GROUP BY date
+ORDER BY count DESC;
+
+CREATE VIEW error_percent AS
+SELECT total_request.date,ROUND(100.0* error_request.count/total_request.count)
+FROM total_request, error_request
+WHERE total_request.date = error_request.date
+ORDER BY round DESC;
+
+    date    | round 
+------------+-------
+ 2016-07-17 |     2
+
+
+
+
+
+
